@@ -155,9 +155,17 @@ today's actual date with `date +%Y-%m-%d`. Two fields depend on it:
 
 A stale date here either reads as careless or commits her to something already past.
 
-**Portfolio URL is pending.** `profile.yaml` has `portfolio: ""` because her site isn't live yet.
-When a form asks for a website or portfolio, **remind her** — she asked to be prompted. Leave it
-blank if it isn't ready; never substitute the GitHub URL for it silently.
+**Resume freshness.** The canonical resume is published at
+<https://sophie-hardin.vercel.app/resume.pdf> and Sophie updates it there. Before attaching
+`resumes/sdet-qa.pdf`, check whether the hosted version is newer — the local copy has already gone
+stale once:
+
+```bash
+curl -s -L -o /tmp/site-resume.pdf https://sophie-hardin.vercel.app/resume.pdf
+diff <(pdftotext -layout /tmp/site-resume.pdf -) <(pdftotext -layout resumes/sdet-qa.pdf -)
+```
+
+If they differ, tell her and offer to refresh the local copy. Never silently attach the older one.
 
 Rules for the free-text drafts — this is where quality actually lives:
 
