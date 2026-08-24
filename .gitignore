@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────────────────────
+# PII — never commit. This file exists before any real data does.
+# ─────────────────────────────────────────────────────────────
+
+# Personal profile: name, address, phone, education, work history
+profile/
+
+# Resume PDFs and their metadata
+resumes/
+
+# Per-application working dirs. review.md contains address/phone
+# as literal field values, so these are PII too.
+applications/
+
+# Master application tracker
+log.md
+
+# Browser profile dir, if it ever ends up inside the repo.
+# It holds session cookies for logged-in ATS accounts.
+.browser-profile/
+*.har
+storage-state.json
+auth.json
+
+# playwright-cli writes page snapshots here after every command. Once a form is
+# filled, those snapshots contain the address/phone/work history as literal
+# values — treat them as PII.
+.playwright-cli/
+*.yml.snapshot
+
+# ─────────────────────────────────────────────────────────────
+# Anything that looks like a credential
+# ─────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+
+# ─────────────────────────────────────────────────────────────
+# Tooling / OS noise
+# ─────────────────────────────────────────────────────────────
+node_modules/
+.DS_Store
+*.log
+.playwright/
+playwright-report/
+test-results/
+
+# Scratch space
+scratch/
+tmp/

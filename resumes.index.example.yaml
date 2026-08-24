@@ -1,0 +1,39 @@
+# Copy to resumes/index.yaml, alongside your PDFs. That directory is gitignored.
+#
+# This is what lets a resume get picked for a posting with an actual reason
+# attached, rather than "here's the most recent one."
+
+resumes:
+  - file: backend-infra.pdf
+    label: Backend / infrastructure
+    updated: "2026-08-01"
+    target_roles:
+      - Backend Engineer
+      - Infrastructure Engineer
+      - Platform Engineer
+    emphasizes:
+      - Distributed systems
+      - Go, Postgres, Kubernetes
+      - On-call and reliability work
+    notes: >
+      Leads with the payments migration. Best default for anything
+      systems-flavored.
+
+  - file: fullstack-product.pdf
+    label: Full-stack / product
+    updated: "2026-07-15"
+    target_roles:
+      - Full Stack Engineer
+      - Product Engineer
+      - Software Engineer
+    emphasizes:
+      - React and TypeScript
+      - Shipping user-facing features
+      - Working directly with design
+    notes: >
+      Use when the posting talks about product sense or user impact more
+      than infrastructure.
+
+# Which one to fall back to when nothing matches well. You'll still be asked
+# before it's used.
+default: fullstack-product.pdf

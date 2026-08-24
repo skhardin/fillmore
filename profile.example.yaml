@@ -1,0 +1,77 @@
+# Copy to profile/profile.yaml and fill in. That path is gitignored.
+# Everything here is fake sample data.
+#
+# Anything you leave blank simply becomes a "needs your input" line in review.md.
+# Never put SSN, driver's license, passport, or bank details in this file —
+# those are handed back to you at fill time by design.
+
+personal:
+  first_name: Jane
+  middle_name: ""
+  last_name: Doe
+  preferred_name: ""        # if forms should use something other than first_name
+  pronouns: ""              # only used if a form explicitly asks
+  email: jane.doe@example.com
+  phone: "+1 555 012 3456"
+
+address:
+  line1: 123 Example St
+  line2: Apt 4
+  city: San Francisco
+  state: CA
+  postal_code: "94110"
+  country: United States
+
+links:
+  linkedin: https://www.linkedin.com/in/example
+  github: https://github.com/example
+  portfolio: https://example.com
+  other: []
+
+work_authorization:
+  authorized_to_work_us: true
+  requires_sponsorship: false
+  # Common phrasings vary a lot; these two booleans cover most forms.
+  visa_status: ""           # e.g. "US Citizen", "Permanent Resident", "H-1B"
+
+education:
+  - school: Example University
+    degree: Bachelor of Science
+    field_of_study: Computer Science
+    start_date: "2016-09"
+    end_date: "2020-05"     # blank if ongoing
+    gpa: ""                 # leave blank to omit; only fill if you want it disclosed
+    location: Berkeley, CA
+
+work_history:
+  - company: Acme Corp
+    title: Senior Software Engineer
+    start_date: "2022-03"
+    end_date: ""            # blank means current
+    location: San Francisco, CA
+    current: true
+    summary: >
+      One or two sentences. This is a fallback for forms that demand a
+      description field — your resume remains the source of truth.
+
+  - company: Startup Inc
+    title: Software Engineer
+    start_date: "2020-06"
+    end_date: "2022-02"
+    location: Remote
+    current: false
+    summary: >
+      Short description.
+
+preferences:
+  # Used only when a form requires an answer. Blank = ask before filling.
+  desired_salary: ""        # consider leaving blank; many forms accept "Negotiable"
+  salary_disclosure: "Negotiable"
+  earliest_start_date: ""   # e.g. "2 weeks from offer"
+  willing_to_relocate: false
+  remote_preference: "Remote or hybrid"
+  how_did_you_hear: "Company website"
+
+references:
+  available_on_request: true
+  contacts: []              # leave empty; share deliberately, not by default

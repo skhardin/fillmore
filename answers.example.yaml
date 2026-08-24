@@ -1,0 +1,61 @@
+# Copy to profile/answers.yaml. That path is gitignored.
+#
+# Reusable answers to questions that recur across applications. The point is that
+# you answer each of these once, well, instead of improvising at 11pm on a Tuesday.
+
+# ─────────────────────────────────────────────────────────────
+# Demographic / EEO
+# ─────────────────────────────────────────────────────────────
+# Default for every one of these is "prefer not to answer". These fields are never
+# inferred from your name, resume, or anything else. Set a value ONLY if you
+# actively want it disclosed.
+eeo:
+  gender: prefer_not_to_answer
+  race_ethnicity: prefer_not_to_answer
+  veteran_status: prefer_not_to_answer
+  disability_status: prefer_not_to_answer
+  lgbtq: prefer_not_to_answer
+
+# ─────────────────────────────────────────────────────────────
+# Screening questions
+# ─────────────────────────────────────────────────────────────
+screening:
+  authorized_to_work: "Yes"
+  require_sponsorship: "No"
+  over_18: "Yes"
+  previously_employed_here: "No"
+  related_to_employee: "No"
+  non_compete: "No"
+  background_check_consent: ""   # blank = ask each time; this is a real consent
+  can_perform_essential_functions: "Yes"
+
+# ─────────────────────────────────────────────────────────────
+# Free-text building blocks
+# ─────────────────────────────────────────────────────────────
+# Not templates to paste verbatim — raw material for drafting an answer that's
+# specific to the posting. A generic "why us" answer reads as generic.
+narrative:
+  what_i_want_next: >
+    What you're actually looking for in your next role. Be honest and specific;
+    this is the seed for most "why this role" answers.
+
+  strengths: >
+    Two or three things you're genuinely good at, with a concrete example each.
+
+  why_leaving: >
+    A calm, non-negative framing of why you're looking.
+
+  notable_projects:
+    - name: Project name
+      what: What it was and what you did.
+      impact: Outcome, with a number if you have one.
+
+# ─────────────────────────────────────────────────────────────
+# Logistics
+# ─────────────────────────────────────────────────────────────
+logistics:
+  notice_period: "2 weeks"
+  interview_availability: "Weekdays, flexible"
+  # Blank means it gets surfaced for you to decide per application, which is
+  # usually the right call for compensation.
+  salary_expectation: ""
