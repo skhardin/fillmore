@@ -71,8 +71,25 @@ playwright-cli -s=apply --raw eval "JSON.stringify([...document.querySelectorAll
 Verified against a live Greenhouse form: returns first/last/email as required, plus phone,
 country, the `type: file` resume input, and any custom screening questions.
 
-Fields can come back with an empty `label` — a real case on Greenhouse. Never guess what an
-unlabeled field wants; snapshot around it for context, and if it's still ambiguous it's an **ask**.
+Fields can come back with an empty `label` — a real case on Greenhouse and on every Zoho field.
+Never guess what an unlabeled field wants; snapshot around it for context, and if it's still
+ambiguous it's an **ask**. When `<label for>` associations are missing, walk up the DOM for the
+nearest text instead:
+
+```bash
+playwright-cli -s=apply --raw eval "(() => {const out=[];document.querySelectorAll('input,select,textarea').forEach(e=>{if(e.type==='hidden'||e.type==='button')return;let n=e,lbl='';for(let k=0;k<6&&n;k++){n=n.parentElement;if(!n)break;const t=(n.innerText||'').trim();if(t&&t.length<200){lbl=t.split('\n')[0].trim();if(lbl)break;}}out.push({type:e.type,name:e.name||e.id,label:lbl.slice(0,70)});});return JSON.stringify(out,null,1);})()"
+```
+
+**This inventory misses collapsed sections.** Tabular blocks behind an **Add** button (Zoho's
+"Educational Details" / "Experience Details", Workday's repeating groups) contain **no input
+elements until expanded**, so they never appear. Always cross-check against the page's visible
+text before drafting:
+
+```bash
+playwright-cli -s=apply --raw eval "document.body.innerText" | grep -iE "add|details|\*"
+```
+
+Missing one means `review.md` is incomplete and Sophie reviews a form that isn't the real form.
 
 Fall back to a snapshot when you need surrounding structure, and `find` for long Workday/iCIMS
 forms:
@@ -157,12 +174,12 @@ A stale date here either reads as careless or commits her to something already p
 
 **Resume freshness.** The canonical resume is published at
 <https://sophie-hardin.vercel.app/resume.pdf> and Sophie updates it there. Before attaching
-`resumes/sdet-qa.pdf`, check whether the hosted version is newer — the local copy has already gone
+`resumes/Sophie-Hardin-resume.pdf`, check whether the hosted version is newer — the local copy has already gone
 stale once:
 
 ```bash
 curl -s -L -o /tmp/site-resume.pdf https://sophie-hardin.vercel.app/resume.pdf
-diff <(pdftotext -layout /tmp/site-resume.pdf -) <(pdftotext -layout resumes/sdet-qa.pdf -)
+diff <(pdftotext -layout /tmp/site-resume.pdf -) <(pdftotext -layout resumes/Sophie-Hardin-resume.pdf -)
 ```
 
 If they differ, tell her and offer to refresh the local copy. Never silently attach the older one.
@@ -236,6 +253,45 @@ application folder.
 
 **Greenhouse / Lever / Ashby** — usually no login, single page, honest labels. Start here.
 
+**Gem (jobs.gem.com)** — clean single-page form, no login, no CAPTCHA. Radio inputs carry no
+accessibility ref; click the adjacent `generic [cursor=pointer]` label instead, then verify
+`.checked`. Offers "Apply and save" (creates a standing Gem profile) vs "Apply without saving" —
+**default to without saving** unless Sophie says otherwise.
+
+**Zoho Recruit** — every field returns an empty label and an opaque `rec-form_<id>` name; derive
+labels from the DOM walk. Checkboxes and radios are wrapped in `label.lyteCheckbox` / styled
+labels and **ignore programmatic `.check()`** — click the label and verify after. Tabular
+"Educational Details" / "Experience Details" sections hide behind **Add** buttons. Date ranges
+validate as "'To Year' cannot be empty when 'From Year' is filled"; a "currently work here"
+checkbox clears it.
+
+**SmartRecruiters (oneclick-ui)** — the whole form is **shadow DOM** (~1,815 `spl-*` hosts);
+`document.querySelectorAll('input')` returns one element. Use Playwright **role locators**, which
+pierce open shadow roots, or walk `shadowRoot` recursively for inventory. CSS ids are ambiguous
+(`#first-name-input` matches the wrapper *and* the input; `.first()` picks the unfillable wrapper).
+`getByLabel('Email',{exact:true})` fails because the label renders as `Email*`.
+
+Its **autocomplete comboboxes silently clear on blur** unless an option is selected — Title,
+Company, Office location, Institution, School location. Type, wait ~2s, click the option, then
+verify. Typing alone leaves them empty and `[invalid]`.
+
+Its **date fields are month/year picker dialogs**: typing "08/2022" registers as January. Click the
+field, `fill` the "Current year" spinbutton, then click the month gridcell — matching on **visible
+text** (`^Aug$`), since the gridcell aria-labels keep a stale year.
+
+**File uploads that open a chooser.** If `setInputFiles` does nothing (common in shadow DOM), click
+the upload control and run `playwright-cli -s=apply upload <path>`. A manual
+`waitForEvent('filechooser')` leaves a modal that blocks *every* later call with "does not handle
+the modal state" — `upload` is the documented recovery.
+
+**`run-code` has no `require()`.** Reading a file inside it fails silently and leaves the field
+empty. Pass long text inline as a JSON-escaped string, and always read the value back.
+
+**Always read values back after writing.** Across Zoho, Gem, and SmartRecruiters, three different
+mechanisms failed *silently*: styled checkboxes ignoring `.check()`, a `require()`-based fill
+returning empty, and autocompletes clearing on blur. A write that reports success is not evidence
+the value landed.
+
 **Workday** — account per employer, so expect a blocker at step one. Heavily paginated with a
 "My Experience" section that re-asks everything the resume already says. Its resume parser is
 poor; budget real time for corrections. Snapshots are large — use `find`, and `--depth` to limit.
@@ -245,8 +301,23 @@ account creation. CAPTCHAs show up here more than anywhere else — hand them ov
 
 **LinkedIn Easy Apply** — out of scope. Automating it violates their ToS and risks her account.
 
+## Applications that prohibit AI assistance
+
+Some employers require an attestation like *"I agree not to use any forms of AI in the application
+and/or interview process."* Seen on Bellese (Lever), 2026-08-25.
+
+**When a form carries one, stop.** Do not fill fields, do not draft free-text answers. Filling it
+and letting Sophie agree to that statement makes the attestation false — and these appear most often
+on government-contract roles where the application feeds a background investigation.
+
+What is still fine: reading the posting, assessing the match, and transcribing their questions so she
+can draft offline. What is not: authoring any part of what gets submitted.
+
+Scan for this before filling. Look for "AI" near "agree", "attest", or "certify".
+
 ## Never
 
+- Fill an application that attests the applicant won't use AI
 - Submit without explicit approval for that application
 - Enter a password, create an account, or attempt a CAPTCHA
 - Enter SSN, driver's license, passport, or bank details
